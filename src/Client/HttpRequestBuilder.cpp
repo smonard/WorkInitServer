@@ -63,6 +63,14 @@ public:
         return BuildRequest(requestBody, resource);
     }
 
+     string PostForFindByName(string sessionId,string name){
+        string ss1 = string("{\"using\":\"name\",\"value\":\"" + name +  "\"}");
+        const char * requestBody = ss1.c_str();
+        string ss = string("/session/" + sessionId + "/element");
+        const char * resource = ss.c_str();
+        return BuildRequest(requestBody, resource);
+    }
+
     string PostForSetText(string sessionId, string elementId, string text){
         string ss1 = string("{\"value\":[\"" + text +  "\"]}");
         const char * requestBody = ss1.c_str();

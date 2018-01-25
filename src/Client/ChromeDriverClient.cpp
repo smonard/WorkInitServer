@@ -124,6 +124,15 @@ public:
      return (status1 + FindStatusCode(driverResponseSV));
   }
 
+  unsigned char PutTextAtElementByName(string session, string elementName, string user)
+  {
+     string driverResponseFE = MakeRequest( httpRequestBuilder->PostForFindByName(session, elementName));
+     unsigned char status1 = FindStatusCode(driverResponseFE);
+     string rq = httpRequestBuilder->PostForSetText(session, FindElementId(driverResponseFE), user);
+     string driverResponseSV = MakeRequest(rq);
+     return (status1 + FindStatusCode(driverResponseSV));
+  }
+
   unsigned char CreateTab(string session, string url)
   {
      string tabName = "tab" + to_string(rand() % 100);

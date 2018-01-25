@@ -30,8 +30,43 @@ private:
     {
         string sessionId = webBrowserClient->StartWebBrowserSession();
         unsigned char status = webBrowserClient->OpenUrl(sessionId, std::getenv("MAIN_URL"));
-        status &= OpenLogsSession(sessionId, credential);
         status &= OpenBoardSession(sessionId, credential);
+        status &= OpenLogsSession(sessionId, credential);
+        status &= OpenPipelineSession(sessionId, credential);
+        return status;
+    }
+
+    unsigned char OpenPipelineSession(string sessionId, Credential* credential)
+    {
+        cout<<"Initializing Pipeline"<<endl;
+        char* pipesUrl = std::getenv("PIPELINE_URLS");
+
+        string buf;
+        stringstream ss(pipesUrl);
+        bool login = true;
+        unsigned char status = 0;
+        while (std::getline(ss, buf, ';')){
+            status += OpenPipelineTab(sessionId, credential, buf, login);
+            login = false;
+        }
+        if(status)
+        {
+            perror("Something went wrong when trying to open a Pipeline session");
+            return 1;
+        }
+        cout<<"Done"<<endl;
+
+        return status;
+    }
+
+    unsigned char OpenPipelineTab(string sessionId, Credential* credential, string url, bool login)
+    {
+        unsigned char status = webBrowserClient->CreateTab(sessionId, url);
+        if(login) {
+            status += webBrowserClient->PutTextAtElement(sessionId, "j_username", (*credential).GetUser());
+            status += webBrowserClient->PutTextAtElementByName(sessionId, "j_password", (*credential).GetKey());
+            status += webBrowserClient->SubmitElement(sessionId, "yui-gen1-button");
+        }
         return status;
     }
 
